@@ -1,0 +1,23 @@
+﻿@model Document
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<div class="row">
+   <h1>@Model.Title</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-5 col-12">
+        <img src="@Model.Image" alt="@Model.Title" class="w-100" />
+    </div>
+    <div class="col-md-7 col-12">
+        <div class="text">
+            @Model.Description
+        </div>
+        <div class="mt-4">
+            <button type="button" class="btn btn-primary">Request Document</button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,25 @@
+﻿@model IEnumerable<Document>
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>
+
+<div class="row">
+    @foreach (var document in Model)
+    {
+        <div class="col-md-4 col-12">
+            <div class="card">
+                <img src="@document.Image" class="card-img-top" alt="@document.Title">
+                <div class="card-body">
+                    <h5 class="card-title">@document.Title</h5>
+                    <a asp-action="DocumentDetails" asp-controller="Home" asp-route-id="@document.Id" class="btn btn-primary">Details</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
