@@ -5,7 +5,7 @@
 }
 
 <div class="row">
-   <h1>@Model.Title</h1>
+    <h1>@Model.Title</h1>
 </div>
 
 <div class="row">
@@ -17,7 +17,43 @@
             @Model.Description
         </div>
         <div class="mt-4">
-            <button type="button" class="btn btn-primary">Request Document</button>
+            @if (ViewBag.Requestable == false)
+            {
+                <button type="button" class="btn btn-primary" disabled>Already Requested</button>
+            }
+            else
+            {
+                if (User.Identity.IsAuthenticated)
+                {
+                    <button type="button" onclick="RequestDocument(@Model.Id)" class="btn btn-primary">Request Document</button>
+                }
+                else
+                {
+                    <a role="button" class="btn btn-primary" asp-area="Identity" asp-page="/Account/Login" asp-route-returnUrl="/home/documentdetails/@Model.Id">Request Document</a>
+                }
+            }
+
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        function RequestDocument(documentId) {
+            $.ajax({
+                url: '/request/submit',
+                data: { documentId: documentId },
+                type: 'post',
+                success: function (response) {
+                    if (response.success) {
+                        alert("document requested successfully. please wait for confirmation");
+
+                        location.reload();
+                    }
+
+                    alert("request failed!");
+                }
+            })
+        }
+    </script>
+}

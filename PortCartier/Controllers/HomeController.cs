@@ -2,7 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using PortCartier.Data;
+using PortCartier.Models.Enums;
 using PortCartier.Models.ViewModels;
+using System;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -28,6 +30,16 @@ namespace PortCartier.Controllers
             var document = await _context.Documents.SingleOrDefaultAsync(model => model.Id == id);
 
             if (document == null) return NotFound();
+
+            var request = await _context.Requests.FirstOrDefaultAsync(model => model.DocumentId == document.Id && model.Status == RequestStatus.Waiting);
+
+            ViewData["Requestable"] = true;
+
+            var currentDate = DateTime.Now;
+
+            var loaned = await _context.Loans.AnyAsync(model => model.DocumentId == document.Id && model.ExpectedReturnDate > currentDate);
+
+            if (request != null || loaned) ViewData["Requestable"] = false;
 
             return View(document);
         }

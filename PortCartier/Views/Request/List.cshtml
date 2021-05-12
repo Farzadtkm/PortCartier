@@ -1,0 +1,125 @@
+﻿@model IEnumerable<PortCartier.Models.Entities.Request>
+
+@{
+    ViewData["Title"] = "List";
+}
+
+<h1>Requests List</h1>
+
+<table class="table table-bordered">
+    <thead>
+        <tr>
+
+            <th>
+                @Html.DisplayNameFor(model => model.Document)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Created)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Document.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.FullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Created)
+                </td>
+                <td>
+                    @switch (item.Status)
+                    {
+                        case PortCartier.Models.Enums.RequestStatus.Waiting:
+                            <button class="btn btn-success" type="button" data-toggle="modal" data-target="#confirm-modal" data-requestId="@item.Id">confirm</button>
+                            <button class="btn btn-danger" type="button" onclick="RejectRequest(@item.Id)">reject</button>
+                            break;
+                        case PortCartier.Models.Enums.RequestStatus.Confirmed:
+                            <span class="text-success">confirmed</span>
+                            break;
+                        case PortCartier.Models.Enums.RequestStatus.Rejected:
+                            <span class="text-danger">rejected</span>
+                            break;
+                        default:
+                            break;
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="modal fade" id="confirm-modal" tabindex="-1" aria-labelledby="confirm-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirm-modal-label">Confirm Request</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input type="hidden" id="requestId" />
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label">Recipient:</label>
+                        <input type="date" class="form-control" id="returned-date">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" onclick="ConfirmRequest()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function ConfirmRequest() {
+            var date = $("#returned-date").val();
+
+            var requestId = $("#requestId").val();
+
+            $.ajax({
+                url: "/request/changerequeststatus",
+                data: { status: true, returnedDate: date, requestId: requestId },
+                type: "POST",
+                success: function () {
+                    location.reload();
+                }
+            })
+        }
+
+        function RejectRequest(requestId) {
+            
+            $.ajax({
+                url: "/request/changerequeststatus",
+                data: { status: false, requestId: requestId },
+                type: "POST",
+                success: function () {
+                    location.reload();
+                }
+            })
+        }
+
+        $('#confirm-modal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var recipient = button.attr('data-requestId');
+            var modal = $(this);
+            modal.find('#requestId').val(recipient);
+        })
+    </script>
+}
